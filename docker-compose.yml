@@ -56,7 +56,7 @@ services:
       cache_from:
         - ${IMAGE_NAME}:${IMAGE_VERSION}-ad
       args:
-        OTEL_JAVA_AGENT_VERSION: ${OTEL_JAVA_AGENT_VERSION}
+        DD_JAVA_AGENT_VERSION: ${DD_JAVA_AGENT_VERSION}
     deploy:
       resources:
         limits:
@@ -68,7 +68,6 @@ services:
       - AD_PORT
       - FLAGD_HOST
       - FLAGD_PORT
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://${OTEL_COLLECTOR_HOST}:${OTEL_COLLECTOR_PORT_HTTP}
       - OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
       - OTEL_RESOURCE_ATTRIBUTES
       - OTEL_LOGS_EXPORTER=otlp
@@ -76,8 +75,6 @@ services:
       # Workaround on OSX for https://bugs.openjdk.org/browse/JDK-8345296
       - _JAVA_OPTIONS
     depends_on:
-      otel-collector:
-        condition: service_started
       flagd:
         condition: service_started
     logging: *logging

@@ -48,13 +48,13 @@ services:
 
   # AdService
   ad:
-    image: ${IMAGE_NAME}:${DEMO_VERSION}-ad
+    image: ${IMAGE_NAME}:local-ad
     container_name: ad
     build:
       context: ./
       dockerfile: ${AD_DOCKERFILE}
       cache_from:
-        - ${IMAGE_NAME}:${IMAGE_VERSION}-ad
+        - ${IMAGE_NAME}:local-ad
       args:
         DD_JAVA_AGENT_VERSION: ${DD_JAVA_AGENT_VERSION}
     deploy:
@@ -72,6 +72,8 @@ services:
       - OTEL_RESOURCE_ATTRIBUTES
       - OTEL_LOGS_EXPORTER=otlp
       - OTEL_SERVICE_NAME=ad
+      - DD_AGENT_HOST=host.docker.internal
+      - DD_DYNAMIC_INSTRUMENTATION_ENABLED=true
       # Workaround on OSX for https://bugs.openjdk.org/browse/JDK-8345296
       - _JAVA_OPTIONS
     depends_on:

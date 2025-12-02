@@ -77,6 +77,9 @@ services:
       - DD_DOGSTATSD_HOST=datadog-agent
       - DD_DOGSTATSD_PORT=8125
       - DD_DYNAMIC_INSTRUMENTATION_ENABLED=true
+      - DD_SERVICE=ad-jfree
+      - DD_ENV=dev-jfree
+      - DD_VERSION=${IMAGE_VERSION}
       # Workaround on OSX for https://bugs.openjdk.org/browse/JDK-8345296
       - _JAVA_OPTIONS
     depends_on:

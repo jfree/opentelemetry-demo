@@ -239,15 +239,15 @@ services:
 
   # Fraud Detection service
   fraud-detection:
-    image: ${IMAGE_NAME}:${DEMO_VERSION}-fraud-detection
+    image: ${IMAGE_NAME}:local-fraud-detection
     container_name: fraud-detection
     build:
       context: ./
       dockerfile: ${FRAUD_DOCKERFILE}
       cache_from:
-        - ${IMAGE_NAME}:${IMAGE_VERSION}-fraud-detection
+        - ${IMAGE_NAME}:local-fraud-detection
       args:
-        OTEL_JAVA_AGENT_VERSION: ${OTEL_JAVA_AGENT_VERSION}
+        DD_JAVA_AGENT_VERSION: ${DD_JAVA_AGENT_VERSION}
     deploy:
       resources:
         limits:
@@ -257,14 +257,20 @@ services:
       - FLAGD_HOST
       - FLAGD_PORT
       - KAFKA_ADDR
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://${OTEL_COLLECTOR_HOST}:${OTEL_COLLECTOR_PORT_HTTP}
       - OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
       - OTEL_INSTRUMENTATION_KAFKA_EXPERIMENTAL_SPAN_ATTRIBUTES=true
       - OTEL_INSTRUMENTATION_MESSAGING_EXPERIMENTAL_RECEIVE_TELEMETRY_ENABLED=true
       - OTEL_RESOURCE_ATTRIBUTES
-      - OTEL_SERVICE_NAME=fraud-detection
+      - DD_AGENT_HOST=datadog-agent
+      - DD_TRACE_AGENT_PORT=8126
+      - DD_DOGSTATSD_HOST=datadog-agent
+      - DD_DOGSTATSD_PORT=8125
+      - DD_DYNAMIC_INSTRUMENTATION_ENABLED=true
+      - DD_SERVICE=fraud-detection-jfree
+      - DD_ENV=dev-jfree
+      - DD_VERSION=${IMAGE_VERSION}
     depends_on:
-      otel-collector:
+      datadog-agent:
         condition: service_started
       kafka:
         condition: service_healthy
@@ -973,9 +979,12 @@ services:
       - DD_SITE=datadoghq.com
       - DD_APM_ENABLED=true
       - DD_LOGS_ENABLED=true
+      - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+      - DD_LOGS_CONFIG_AUTO_MULTI_LINE_DETECTION=true
       - DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /proc/:/host/proc/:ro
       - /sys/fs/cgroup:/host/sys/fs/cgroup:ro
     ports:

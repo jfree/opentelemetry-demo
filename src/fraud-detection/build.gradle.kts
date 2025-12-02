@@ -38,7 +38,6 @@ dependencies {
     implementation("io.grpc:grpc-netty:${grpcVersion}")
     implementation("io.grpc:grpc-services:${grpcVersion}")
     implementation("io.opentelemetry:opentelemetry-api:1.56.0")
-    implementation("io.opentelemetry:opentelemetry-sdk:1.56.0")
     implementation("io.opentelemetry:opentelemetry-extension-annotations:1.18.0")
     implementation("org.apache.logging.log4j:log4j-core:2.25.2")
     implementation("org.slf4j:slf4j-api:2.0.17")
@@ -54,6 +53,10 @@ dependencies {
 }
 
 tasks {
+    compileJava {
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
+    }
     shadowJar {
         mergeServiceFiles()
     }
